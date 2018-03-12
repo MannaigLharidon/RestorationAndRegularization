@@ -11,13 +11,14 @@ import scipy.io as sio
 import scipy.signal as ssi
 import scipy.fftpack as sfftp
 
+"""
 #####################################################################
 #                                                                   #
 #                       RESTAURATION D'IMAGES                       #
-#                                                                   #
 #          TP1: Resolution d'un probleme inverse sur signaux        #
 #                                                                   #
 #####################################################################
+"""
 
 
 """                            OBJECTIF DU TP 
@@ -28,8 +29,13 @@ Analyser et resoudre deux problemes inverses sur des signaux discretises
 ricker = sio.loadmat('ricker.mat')
 
 
-""" PARTIE 1 : PROBLEMES DIRECT ET INVERSE """
-
+"""
+////////////////////////////////////////////////////////
+//                                                    //
+//        PARTIE 1 : PROBLEMES DIRECT ET INVERSE      //
+//                                                    //
+////////////////////////////////////////////////////////
+"""
 
 ################## Interpretation du probleme direct ##################
 
@@ -120,7 +126,14 @@ for s in range(np.size(sigma)):
     plt.figure()
 """
 
-""" PARTIE 2 : REGULARISATION """
+
+"""
+////////////////////////////////////////////////////////
+//                                                    //
+//              PARTIE 2 : REGULARISATION             //
+//                                                    //
+////////////////////////////////////////////////////////
+"""
 
 #On travaille maintenant avce les donnees ricker
 A_R = ricker['A']
