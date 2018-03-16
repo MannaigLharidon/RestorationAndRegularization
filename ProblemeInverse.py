@@ -10,6 +10,7 @@ import numpy as np
 import scipy.io as sio
 import scipy.signal as ssi
 import scipy.fftpack as sfftp
+import cmath
 
 """
 #####################################################################
@@ -35,40 +36,38 @@ def probleme(data):
     """ 1.Interpretation du probleme direct """
 
     # Dimensions du problème
-    dimx = data['dimx']
-    dimy = data['dimy']
-    dima = data['dima']
-    
-    # Affichage de la matrice de la transformation linéaire A
+    dimx, dimy = data['dimx'], data['dimy']
+
+    # Matrice de la transformation linéaire A
     A = data['A']
       
     # Signal d'entrée x
     x = data['x']
-    plt.figure()
-    plt.title('Signal d entree')
-    plt.plot(x)
-    plt.show()
+#    plt.figure()
+#    plt.title('Signal d entree')
+#    plt.plot(x)
+#    plt.show()
     
     # Signal de sortie y : signal d'entree par la transformation lineaire A
     y = np.dot(A,x)
-    plt.figure()
-    plt.title('Signal de sortie par transformation lineaire')
-    plt.plot(y)
-    plt.show()
+#    plt.figure()
+#    plt.title('Signal de sortie par transformation lineaire')
+#    plt.plot(y)
+#    plt.show()
     
     # Ondelette a
     a = data['a']
-    plt.figure()
-    plt.title('Ondelette')
-    plt.plot(y)
-    plt.show()
+#    plt.figure()
+#    plt.title('Ondelette')
+#    plt.plot(y)
+#    plt.show()
     
     # Signal convolué yc : convolution du signal d'entree par l'ondelette a
     yc = ssi.convolve(x,a)
-    plt.figure()
-    plt.title('Signal de sortie par convolution')
-    plt.plot(yc)
-    plt.show()
+#    plt.figure()
+#    plt.title('Signal de sortie par convolution')
+#    plt.plot(yc)
+#    plt.show()
     
     # Différence des signaux y et yc
     diff_yyc = y - yc
@@ -78,10 +77,10 @@ def probleme(data):
     plt.show()
     
     # Affichage de la matrice de la transformation linéaire A
-    plt.figure()
-    plt.title('Transformation lineaire A')
-    plt.imshow(A)
-    plt.show()
+#    plt.figure()
+#    plt.title('Transformation lineaire A')
+#    plt.imshow(A)
+#    plt.show()
     
     
     """ 2.Etude du caractere bien pose ou bien conditionné du probleme """
@@ -90,10 +89,10 @@ def probleme(data):
     singA = np.linalg.svd(A,compute_uv=False)
     
     # Affichage du spectre des valeurs singulieres
-    plt.figure()
-    plt.title('Valeurs singulieres de A')
-    plt.plot(singA)
-    plt.show()
+#    plt.figure()
+#    plt.title('Valeurs singulieres de A')
+#    plt.plot(singA)
+#    plt.show()
     
     # Calcul du conditionnement de A
     condA = np.linalg.cond(A)
@@ -107,38 +106,45 @@ def probleme(data):
     # Matrice inverse de A par la pseudo inverse
     invA = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)),np.transpose(A))
     
-    for s in range(np.size(sigma)):
+    for s in sigma :
         
         # Signal bruité yb
-        gaussien = sigma[s] * np.random.randn(dimy,1)
+        gaussien = s * np.random.randn(dimy,1)
         yb = y + gaussien
-        plt.figure()
-        plt.title("y et yb pour sigma={}".format(sigma[s]))
-        plt.plot(y)
-        plt.plot(yb)
-        plt.show()
+#        plt.figure()
+#        plt.title("y et yb pour sigma={}".format(s))
+#        plt.plot(y)
+#        plt.plot(yb)
+#        plt.show()
         
         # Resolution du probleme inverse
         X_chap = np.dot(invA,yb)
         
         # Affichage des signaux entrees
-        plt.figure()
-        plt.title("x et Xchap pour sigma={}".format(sigma[s]))
-        plt.plot(x)
-        plt.plot(X_chap)
-        plt.show()
+#        plt.figure()
+#        plt.title("x et Xchap pour sigma={}".format(s))
+#        plt.plot(x)
+#        plt.plot(X_chap)
+#        plt.show()
         
         
     """ 5.Lien avec la convolution """
     
     # Transformée de Fourier rapide des ondelettes
-    fourier = np.fft.fft(a,n=dimx[0][0])
-#    modules = 
+#    fourier = np.fft.fft(a,n=dimx[0][0])
+#    xF,yF = fourier.shape
+#    modules = np.zeros((xF,yF))
+#    for f in range(xF):
+#        for g in range(yF):
+#            modules[f][g] = cmath.polar(fourier[f][g])[0]
 #    modules = np.sort(modules)[::-1]
-
-    plt.figure()
-    plt.plot(fourier)
-    
+#
+#    plt.figure()
+#    plt.title('Modules de fft(a) et valeurs singulières de A')
+#    plt.plot(singA[1],'r',label='valeurs singulieres')
+#    plt.plot(modules,'b',label='modules')
+#    plt.legend()
+#    plt.show()    
     
     return condA
         
@@ -152,41 +158,44 @@ def probleme(data):
 ////////////////////////////////////////////////////////
 """
 
-##On travaille maintenant avce les donnees ricker
-#A_R = ricker['A']
-#x_R = ricker['x']
-#dimx_R = ricker['dimx']
-#dimy_R = ricker['dimy']
-#dima_R = ricker['dima']
-#a_R = ricker['a']
-#
-################### Regularisation par penalisation sur la norme de la solution, sans bruit ##################
-#
-#y_R = np.dot(A_R,x_R)
-#dimA = np.shape(A_R)[0]
-#
-## Parametre de regularisation
-#alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
-#
-#for a in range(np.size(alpha)):
-#    
-#    # Resolution du probleme inverse avec regularisation
-#    N = np.dot(np.linalg.inv(np.dot(np.transpose(A_R),A_R)+alpha[a]*np.identity(dimA)),np.transpose(A_R))
-#    X_chap = np.dot(N,y_R)
-#    
-#    # Affichage des entrees
-#    plt.plot(x_R)
-#    plt.plot(X_chap)
-#    plt.figure()
-#    
-#
-################### Regularisation par penalisation sur la norme de la solution, avec bruit ##################
-#
-#
-#
-#
-#
-#
+
+
+""" 1-2.Regularisation par penalisation sur la norme de la solution """
+
+def penNorme(data,mode):
+    """
+    Régularisation par pénalisation sur la norme de la solution
+    --> Trouver la valeur max de alpha qui permet d'avoir un bon résultat
+    
+    ENTREE :
+        - data : données issues d'un fichier .mat
+        - mode : 'with_noise' = avec bruit ; 'without_noise' = sans bruit 
+    """
+    A, x = data['A'], data['x']
+    dimA, dimy = np.shape(A)[0], data['dimy']
+    alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
+    
+    y = np.dot(A,x)
+    if mode=="with_noise":
+        for a in alpha:
+            gaussien = a * np.random.randn(dimy,1)
+            yb = y + gaussien
+        y = yb
+    else:
+        y = y
+
+    for a in alpha:
+        # Resolution 
+        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
+        X_chap = np.dot(N,y)
+        # Affichage des entrees
+        plt.plot(x,colr='r',label="signal entree")
+        plt.plot(X_chap,color'b',label="signal estime")
+        plt.legend()
+    plt.show()
+
+
+
 ################### Regularisation par Rdige Regression ##################
 #
 #
@@ -213,10 +222,17 @@ if __name__=="__main__":
     kramer = sio.loadmat('kramer.mat')
     ricker = sio.loadmat('ricker.mat')
     
-    cond_K = probleme(kramer)
+    # Partie 1 
+    #cond_K = probleme(kramer)
     #cond_R = probleme(ricker)
 
+    # Partie 2
+    
+    """ 1.Regularisation par pénalisation sur la norme de la solution, sans bruit """
+    penNorme(kramer,mode='without_noise')
 
+    """ 2.Regularisation par pénalisation sur la norme de la solution, avec bruit """
+    penNorme(ricker,mode='with_noise')
 
 
 
