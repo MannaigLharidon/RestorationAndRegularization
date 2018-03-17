@@ -178,8 +178,7 @@ def penNorme(data,mode):
     y = np.dot(A,x)
     if mode=="with_noise":
         for a in alpha:
-            gaussien = a * np.random.randn(dimy,1)
-            yb = y + gaussien
+            yb = y + a * np.random.randn(dimy,1)
         y = yb
     else:
         y = y
@@ -189,29 +188,91 @@ def penNorme(data,mode):
         N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
         X_chap = np.dot(N,y)
         # Affichage des entrees
-        plt.plot(x,colr='r',label="signal entree")
+        plt.plot(x,color='r',label="signal entree")
         plt.plot(X_chap,color'b',label="signal estime")
         plt.legend()
     plt.show()
 
 
 
-################### Regularisation par Rdige Regression ##################
+################## Regularisation par Ridge Regression ##################
+
+def ridge(data,mode):
+    """
+    Régularisation par Ridge regression
+    --> Trouver la valeur de alpha qui semble optimale
+    
+    ENTREE :
+        - data : données issues d'un fichier .mat
+        - mode : 'with_noise' = avec bruit ; 'without_noise' = sans bruit 
+    """
+    A, x = data['A'], data['x']
+    y = np.dot(A,x)
+    alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
+    if mode=="with_noise":
+        for a in alpha:
+            yb = y + a * np.random.randn(dimy,1)
+        y = yb
+    else:
+        y = y
+    
+    for a in alpha:
+        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.diag(np.diag(np.dot(np.transpose(A),A)))),np.transpose(A))
+        X_chap = np.dot(N,y)
+        # Affichage des entrees
+        plt.plot(x,color='r',label="signal entree")
+        plt.plot(X_chap,color'b',label="signal estime")
+        plt.legend()
+    plt.show()
+
+    
+
+
+
+
+################## Regularisation par troncature du spectre SVD ##################
+
+def troncSVD(data,mode):
+    """
+    Régularisation par tronxature du spectre SVD
+    --> Trouver la valeur de alpha qui semble optimale
+    
+    ENTREE :
+        - data : données issues d'un fichier .mat
+        - mode : 'with_noise' = avec bruit ; 'without_noise' = sans bruit 
+    """
+    A, x = data['A'], data['x']
+    y = np.dot(A,x)
+    alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
+    if mode=="with_noise":
+        for a in alpha:
+            yb = y + a * np.random.randn(dimy,1)
+        y = yb
+    else:
+        y = y
+    
+    for a in alpha:
+        """ Partie a modifier !
+#        sing=np.linalg.svd(data["A"])
+#        for i in range(len(sing[1])):
+#            if sing[1][i]<alpha:
+#                sing[1][i]=0
+#        xi=np.dot(np.dot(np.dot(sing[2],np.nan_to_num(np.diag(1/sing[1]))),sing[0].T),yb)
 #
-#
-#
-#
-#
-#
-################### Regularisation par troncature du spectre SVD ##################
-#
-#
-#
-#
-#
-#
-################### Regularisation par penalisation sur la norme au carre du gradient de la solution ##################
-#
+#        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.diag(np.diag(np.dot(np.transpose(A),A)))),np.transpose(A))
+#        X_chap = np.dot(N,y)
+        """
+        # Affichage des entrees
+        plt.plot(x,color='r',label="signal entree")
+        plt.plot(X_chap,color'b',label="signal estime")
+        plt.legend()
+    plt.show()
+
+
+
+
+################## Regularisation par penalisation sur la norme au carre du gradient de la solution ##################
+
 
 
 
@@ -234,7 +295,8 @@ if __name__=="__main__":
     """ 2.Regularisation par pénalisation sur la norme de la solution, avec bruit """
     penNorme(ricker,mode='with_noise')
 
-
+    """ 3.Régularisation par ridge degression """
+    ridge(ricker,mode='with_noise')
 
 
 
