@@ -159,10 +159,45 @@ import cmath
 
 """ 1-2.Regularisation par penalisation sur la norme de la solution """
 
-def penNorme(data,mode):
+#def penNorme(data,mode):
+#    """
+#    Régularisation par pénalisation sur la norme de la solution
+#    --> Trouver la valeur max de alpha qui permet d'avoir un bon résultat
+#    
+#    ENTREE :
+#        - data : données issues d'un fichier .mat
+#        - mode : 'with_noise' = avec bruit ; 'without_noise' = sans bruit 
+#    """
+#    A, x = data["A"], data["x"]
+#    dimA, dimy = A.shape[0], data["dimy"]
+#
+#    if mode=="without_noise":
+#        y = np.dot(A,x)
+#    else:
+#        y = np.dot(A,x)
+#        bruit = np.random.normal(0,0.1,dimy[0][0])
+#        y = np.add(np.transpose(y)[0],bruit)
+#
+#    for a in np.logspace(-7,0,8):
+#        # Resolution 
+#        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
+#        X_chap = np.dot(N,y)
+#        # Affichage des signaux d'entres
+#        plt.figure()
+#        plt.title("Regularisation par penalisation sur la norme de la solution")
+#        plt.plot(x,color='r',label="signal entre")
+#        plt.plot(X_chap,color='b',label=r"signal estime $\alpha$ = {}".format(a))
+#        plt.legend()
+#    plt.show()
+
+
+
+################## Regularisation par Ridge Regression ##################
+
+def ridge(data,mode):
     """
-    Régularisation par pénalisation sur la norme de la solution
-    --> Trouver la valeur max de alpha qui permet d'avoir un bon résultat
+    Régularisation par Ridge regression
+    --> Trouver la valeur de alpha qui semble optimale
     
     ENTREE :
         - data : données issues d'un fichier .mat
@@ -180,51 +215,16 @@ def penNorme(data,mode):
 
     for a in np.logspace(-7,0,8):
         # Resolution 
-        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
+        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.diag(np.diag(np.dot(np.transpose(A),A)))),np.transpose(A))
         X_chap = np.dot(N,y)
         # Affichage des signaux d'entres
         plt.figure()
-        plt.title("Regularisation par penalisation sur la norme de la solution")
+        plt.title("Regularisation par Ridge regression")
         plt.plot(x,color='r',label="signal entre")
         plt.plot(X_chap,color='b',label=r"signal estime $\alpha$ = {}".format(a))
         plt.legend()
     plt.show()
-
-
-
-################## Regularisation par Ridge Regression ##################
-
-#def ridge(data,mode):
-#    """
-#    Régularisation par Ridge regression
-#    --> Trouver la valeur de alpha qui semble optimale
-#    
-#    ENTREE :
-#        - data : données issues d'un fichier .mat
-#        - mode : 'with_noise' = avec bruit ; 'without_noise' = sans bruit 
-#    """
-#    A, x = data['A'], data['x']
-#    y = np.dot(A,x)
-#    alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
-#    if mode=="with_noise":
-#        for a in alpha:
-#            yb = y + a * np.random.randn(dimy,1)
-#        y = yb
-#    else:
-#        y = y
-#    
-#    for a in alpha:
-#        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.diag(np.diag(np.dot(np.transpose(A),A)))),np.transpose(A))
-#        X_chap = np.dot(N,y)
-#        # Affichage des entrees
-#        plt.plot(x,color='r',label="signal entree")
-#        plt.plot(X_chap,color='b',label="signal estime")
-#        plt.legend()
-#    plt.show()
-
-    
-
-
+ 
 
 
 ################## Regularisation par troncature du spectre SVD ##################
@@ -321,15 +321,14 @@ if __name__=="__main__":
     # Partie 2
     
     """ 1.Regularisation par pénalisation sur la norme de la solution, sans bruit """
-    penNorme(ricker,mode="with_noise")
-    #regul_pen_norme_sans_bruit(ricker,mode="without_noise")
+    #penNorme(ricker,mode="without_noise")
 
 
     """ 2.Regularisation par pénalisation sur la norme de la solution, avec bruit """
-    #penNorme(ricker,mode='with_noise')
+    #penNorme(ricker,mode="with_noise")
 
     """ 3.Régularisation par ridge degression """
-    #ridge(ricker,mode='with_noise')
+    ridge(ricker,mode='with_noise')
 
 
 
