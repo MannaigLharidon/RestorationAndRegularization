@@ -159,31 +159,7 @@ import cmath
 
 """ 1-2.Regularisation par penalisation sur la norme de la solution """
 
-def regul_pen_norme_sans_bruit(data,mode):
-    if mode=="without_noise":
-        y=np.dot(data["A"],data["x"])
-    index=1
-    for alpha in np.logspace(-6,0,7):
-        xi=np.dot(np.dot(np.linalg.inv(np.dot(data["A"].T,data["A"])+alpha*np.identity(data["A"].shape[0])),data["A"].T),y)
-        plt.subplot(4,2,index)
-        plt.plot([i for i in range(data["dimx"][0][0])],data["x"],color="r",label="x")
-        plt.plot([i for i in range(data["dimx"][0][0])],xi,label=r"$x_i$, $\alpha$ = {}".format(alpha))
-        index+=1
-    plt.show()
-    plt.suptitle(r"penalisation norme sans bruit | $\alpha$ de $10^{-6}$ a 10")
-
 def penNorme(data,mode):
-    A, x = data["A"], data["x"]
-    dimA = A.shape[0]
-    y = np.dot(A,x)
-    for alpha in np.logspace(-6,0,7):
-        xi = np.dot(np.dot(np.linalg.inv(np.dot(data["A"].T,data["A"])+alpha*np.identity(data["A"].shape[0])),data["A"].T),y)
-        plt.plot(x,color="r",label="x")
-        plt.plot(xi,color="b",label="xi")
-    plt.show()
-    
-    
-def penNorme1(data,mode):
     """
     Régularisation par pénalisation sur la norme de la solution
     --> Trouver la valeur max de alpha qui permet d'avoir un bon résultat
@@ -194,25 +170,23 @@ def penNorme1(data,mode):
     """
     A, x = data["A"], data["x"]
     dimA, dimy = A.shape[0], data["dimy"]
-    #alpha = np.array([10e-6,10e-5,10e-4,10e-3,10e-2,10e-1,1,10])
-    
-    y = np.dot(A,x)
-#    if mode=="with_noise":
-#        for a in alpha:
-#            yb = y + a * np.random.randn(dimy,1)
-#        y = yb
-#    else:
-#        y = y
+   
+    if mode=="without_noise":
+        y = np.dot(A,x)
+    else:
+        y = np.dot(A,x)
+        bruit = np.random.normal(0,0.1,dimy[0][0])
+        y = np.add(y,bruit)
 
-    #for a in alpha:
-    for alpha in np.logspace(-6,0,7):
+    for a in np.logspace(-7,0,8):
         # Resolution 
-        xi=np.dot(np.dot(np.linalg.inv(np.dot(A.T,A)+alpha*np.identity(dimA)),A.T),y)
-        #N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
-        #X_chap = np.dot(invA,y)
-        # Affichage des entrees
-        plt.plot(x,color='r',label="signal entree")
-        plt.plot(xi,color='b',label="signal estime")
+        N = np.dot(np.linalg.inv(np.dot(np.transpose(A),A)+a*np.identity(dimA)),np.transpose(A))
+        X_chap = np.dot(N,y)
+        # Affichage des signaux d'entres
+        plt.figure()
+        plt.title("Regularisation par penalisation sur la norme de la solution")
+        plt.plot(x,color='r',label="signal entre")
+        plt.plot(X_chap,color='b',label=r"signal estime $\alpha$ = {}".format(a))
         plt.legend()
     plt.show()
 
@@ -347,7 +321,7 @@ if __name__=="__main__":
     # Partie 2
     
     """ 1.Regularisation par pénalisation sur la norme de la solution, sans bruit """
-    penNorme(kramer,mode="without_noise")
+    penNorme(ricker,mode="without_noise")
     #regul_pen_norme_sans_bruit(ricker,mode="without_noise")
 
 
