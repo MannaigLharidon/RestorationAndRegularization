@@ -170,13 +170,13 @@ def penNorme(data,mode):
     """
     A, x = data["A"], data["x"]
     dimA, dimy = A.shape[0], data["dimy"]
-   
+
     if mode=="without_noise":
         y = np.dot(A,x)
     else:
         y = np.dot(A,x)
         bruit = np.random.normal(0,0.1,dimy[0][0])
-        y = np.add(y,bruit)
+        y = np.add(np.transpose(y)[0],bruit)
 
     for a in np.logspace(-7,0,8):
         # Resolution 
@@ -321,7 +321,7 @@ if __name__=="__main__":
     # Partie 2
     
     """ 1.Regularisation par pénalisation sur la norme de la solution, sans bruit """
-    penNorme(ricker,mode="without_noise")
+    penNorme(ricker,mode="with_noise")
     #regul_pen_norme_sans_bruit(ricker,mode="without_noise")
 
 
