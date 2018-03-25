@@ -61,11 +61,21 @@ def mDCT(filtre):
     return filtre2
 
 
+def filtInv(img_bruitee,filtre,name=""):
+    plt.figure()
+    t_img = np.fft.fft2(img_bruitee)
+    t = np.fft.fft2(filtre)
+    divF = np.divide(t_img,t)
+    invF = np.fft.ifft2(divF)
+    plt.title("Filtrage inverse sur {}".format(name))
+    plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
+
+
 
 
 if __name__ == "__main__":
 
-    plt.figure(1)
+    plt.figure()
     I = io.imread('lena.png')
     I = np.float32(I)
     Inorm = I/256
@@ -82,12 +92,12 @@ if __name__ == "__main__":
     """
     
     ########## Filtrage de l'image par convolutin ##########
-    plt.figure(2)
+    plt.figure()
     a = cFiltre(11,11,5)
     plt.title('Filtre a normalisé en forme de disque')
     plt.imshow(a)
 
-    plt.figure(3)
+    plt.figure()
     #Gestion des effets de bord : boundary = "fill","wrap","symm"
     yc = ssi.convolve2d(Inorm,a,mode="same")
     plt.title('Lena convoluée avec le disque a')
@@ -97,7 +107,7 @@ if __name__ == "__main__":
     
     
     ########## Fonction de transfert optique t ##########
-    plt.figure(4)
+    plt.figure()
     grille = cFiltre(I.shape[0],I.shape[1],5)
     t = np.fft.fft2(grille)
     plt.title('Transformée de Fourier du filtre')
@@ -105,18 +115,18 @@ if __name__ == "__main__":
 
 
     ########## Filtrage avec periodisation de l'image ##########
-    plt.figure(5)
+    plt.figure()
     x = np.fft.fft2(Inorm)
     plt.title('Transformée de Fourier de Lena')
     plt.imshow(abs(x))
 
-    plt.figure(6)
+    plt.figure()
     y = x*t
     yf = np.fft.ifftshift(abs(np.fft.ifft2(y)))
     plt.title('Lena filtrée')
     plt.imshow(yf,cmap="gray")
 
-    plt.figure(7)    
+    plt.figure()    
     dy = yf - yc1
     plt.title('Fourier vs convolution')
     plt.imshow(abs(dy),cmap='gray')
@@ -124,13 +134,13 @@ if __name__ == "__main__":
     
     
     ########## Filtrage avec symétrisation de l'image ##########
-    plt.figure(8)
+    plt.figure()
     grille2 = cFiltre(2*I.shape[0],2*I.shape[1],5)
     t2 = np.fft.fft2(grille2)
     plt.title('Fonction de transfert optique n°2')
     plt.imshow(abs(t2))
     
-    plt.figure(9) 
+    plt.figure() 
     dct_t2 = mDCT(t2)
     dct_x = cv2.dct(x)
     y2 = dct_x * dct_t2
@@ -138,7 +148,7 @@ if __name__ == "__main__":
     plt.title('Lena filtrée avec dct')
     plt.imshow(yf2,cmap="gray")
     
-    plt.figure(10)    
+    plt.figure()    
     dy2 = yf2 - yc2
     plt.title('dct vs convolution with symmetry')
     plt.imshow(abs(dy2),cmap='gray')
@@ -156,14 +166,13 @@ if __name__ == "__main__":
     """
     
     ########## Filtrage inverse ##########
-    plt.figure(9)
-    tyf = np.fft.fft2(yf)
-    divF = np.divide(tyf,t)
-    invF = np.fft.ifft2(divF)
-    plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
+    # Cas yc : filtrage de l'image par convolution
+    filtInv(yc,a,"yc")
+    # Cas yf : filtrage avec périodisation de l'image
+    filtInv(yf,grille,"yf")    
+    # Cas yf2 : filtrage avec symmétrisation de l'image
+    filtInv(yf2,grille2,"yf2")
         
-    # Faire les tests sur les autres cas :)
-    
     
     ########## Régularisation du filtre inverse fft ##########
     
