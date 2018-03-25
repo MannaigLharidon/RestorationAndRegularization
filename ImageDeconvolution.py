@@ -29,9 +29,8 @@ def normFiltre(filtre):
     But : normaliser le filtre
     """
     cpt = 0
-    taille = filtre.shape
-    for l in range(taille[0]):
-        for c in range(taille[1]):
+    for l in range(filtre.shape[0]):
+        for c in range(filtre.shape[1]):
             if filtre[l][c] == 1.0 :
                 cpt += 1
     filtre /= cpt
@@ -49,13 +48,12 @@ def cFiltre(taille1,taille2,rayon):
     return filtre
     
     
-def dct(filtre):
+def mDCT(filtre):
     """
     Calcul de la transformée en cosinus discrète
     """
-    taille = filtre.shape
-    t1 = int(abs(taille[0]/2))
-    t2 = int(abs(taille[1]/2))
+    t1 = int(abs(filtre.shape[0]/2))
+    t2 = int(abs(filtre.shape[1]/2))
     filtre2 = np.zeros((t1,t2))
     for l in range(t1):
         for c in range(t2):
@@ -70,7 +68,6 @@ if __name__ == "__main__":
     plt.figure(1)
     I = io.imread('lena.png')
     I = np.float32(I)
-    taille = I.shape
     Inorm = I/256
     plt.title('Lena')
     plt.imshow(Inorm,cmap='gray')
@@ -91,15 +88,17 @@ if __name__ == "__main__":
     plt.imshow(a)
 
     plt.figure(3)
-    #Gestion des effets de bord : boundary = "wrap","symm",...
+    #Gestion des effets de bord : boundary = "fill","wrap","symm"
     yc = ssi.convolve2d(Inorm,a,mode="same")
     plt.title('Lena convoluée avec le disque a')
     plt.imshow(yc,cmap='gray')
+    yc1 = ssi.convolve2d(Inorm,a,mode="same",boundary="wrap")
+    yc2 = ssi.convolve2d(Inorm,a,mode="same",boundary="symm")
     
     
     ########## Fonction de transfert optique t ##########
     plt.figure(4)
-    grille = cFiltre(taille[0],taille[1],5)
+    grille = cFiltre(I.shape[0],I.shape[1],5)
     t = np.fft.fft2(grille)
     plt.title('Transformée de Fourier du filtre')
     plt.imshow(abs(t))
@@ -118,7 +117,7 @@ if __name__ == "__main__":
     plt.imshow(yf,cmap="gray")
 
     plt.figure(7)    
-    dy = yf - yc
+    dy = yf - yc1
     plt.title('Fourier vs convolution')
     plt.imshow(abs(dy),cmap='gray')
     plt.colorbar()
@@ -126,13 +125,25 @@ if __name__ == "__main__":
     
     ########## Filtrage avec symétrisation de l'image ##########
     plt.figure(8)
-    grille2 = cFiltre(2*taille[0],2*taille[1],5)
-    t_grille2 = np.fft.fft2(grille2)
+    grille2 = cFiltre(2*I.shape[0],2*I.shape[1],5)
+    t2 = np.fft.fft2(grille2)
     plt.title('Fonction de transfert optique n°2')
-    plt.imshow(abs(t_grille2))
+    plt.imshow(abs(t2))
     
-    dct_res = dct(x)
-    """ A FINIR !!!!!!! """
+    plt.figure(9) 
+    dct_t2 = mDCT(t2)
+    dct_x = cv2.dct(x)
+    y2 = dct_x * dct_t2
+    yf2 = abs(cv2.idct(y2))
+    plt.title('Lena filtrée avec dct')
+    plt.imshow(yf2,cmap="gray")
+    
+    plt.figure(10)    
+    dy2 = yf2 - yc2
+    plt.title('dct vs convolution with symmetry')
+    plt.imshow(abs(dy2),cmap='gray')
+    plt.colorbar()
+    
 
     
     
