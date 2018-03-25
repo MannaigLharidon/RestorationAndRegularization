@@ -5,6 +5,7 @@ Created on Friday Mars 9 2018
 @author: Mannaig L'Haridon
 """
 
+from matplotlib.font_manager import FontProperties
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
@@ -71,6 +72,19 @@ def filtInv(img_bruitee,filtre,name=""):
     plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
 
 
+def regul_filtInv(img_bruitee,filtre,name=""):
+    plt.subplot("Filtrage inverse regularise sur {}".format(name))
+    plt.suptitle()
+    for a in np.logspace(-7,0,8):
+        t_img = np.fft.fft2(img_bruitee)
+        t = np.fft.fft2(filtre)
+        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),a))
+        invF = np.fft.ifft2(divF)    
+        plt.title("pour $\alpha$ = {}".format(a))
+        plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')   
+
+
+
 
 
 if __name__ == "__main__":
@@ -102,8 +116,6 @@ if __name__ == "__main__":
     yc = ssi.convolve2d(Inorm,a,mode="same")
     plt.title('Lena convoluée avec le disque a')
     plt.imshow(yc,cmap='gray')
-    yc1 = ssi.convolve2d(Inorm,a,mode="same",boundary="wrap")
-    yc2 = ssi.convolve2d(Inorm,a,mode="same",boundary="symm")
     
     
     ########## Fonction de transfert optique t ##########
@@ -127,7 +139,7 @@ if __name__ == "__main__":
     plt.imshow(yf,cmap="gray")
 
     plt.figure()    
-    dy = yf - yc1
+    dy = yf - ssi.convolve2d(Inorm,a,mode="same",boundary="wrap")
     plt.title('Fourier vs convolution')
     plt.imshow(abs(dy),cmap='gray')
     plt.colorbar()
@@ -149,7 +161,7 @@ if __name__ == "__main__":
     plt.imshow(yf2,cmap="gray")
     
     plt.figure()    
-    dy2 = yf2 - yc2
+    dy2 = yf2 - ssi.convolve2d(Inorm,a,mode="same",boundary="symm")
     plt.title('dct vs convolution with symmetry')
     plt.imshow(abs(dy2),cmap='gray')
     plt.colorbar()
@@ -166,16 +178,14 @@ if __name__ == "__main__":
     """
     
     ########## Filtrage inverse ##########
-    # Cas yc : filtrage de l'image par convolution
-    filtInv(yc,a,"yc")
-    # Cas yf : filtrage avec périodisation de l'image
-    filtInv(yf,grille,"yf")    
-    # Cas yf2 : filtrage avec symmétrisation de l'image
-    filtInv(yf2,grille2,"yf2")
+    filtInv(yc,a,"yc")          #Cas yc : filtrage de l'image par convolution
+    filtInv(yf,grille,"yf")     #Cas yf : filtrage avec périodisation de l'image
+    filtInv(yf2,grille2,"yf2")  #Cas yf2 : filtrage avec symmétrisation de l'image
         
     
     ########## Régularisation du filtre inverse fft ##########
-    
+    regul_filtInv(yf,grille,"yf")       #Cas yf : filtrage avec périodisation de l'image
+    regul_filtInv(yf2,grille2,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
     
     
     ########## Régularisation du filtrage inverse dct ##########
