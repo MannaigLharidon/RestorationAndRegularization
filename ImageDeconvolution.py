@@ -63,6 +63,9 @@ def mDCT(filtre):
 
 
 def filtInv(img_bruitee,filtre,name=""):
+    """
+    Méthode de filtrage inverse par la transformée de Fourier
+    """
     plt.figure()
     t_img = np.fft.fft2(img_bruitee)
     t = np.fft.fft2(filtre)
@@ -72,7 +75,10 @@ def filtInv(img_bruitee,filtre,name=""):
     plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
 
 
-def regul_filtInv(img_bruitee,filtre,name=""):
+def regul_filtInv_fft(img_bruitee,filtre,name=""):
+    """
+    Méthode de filtrage inverse régularisée par la transformée de Fourier
+    """
     plt.subplot("Filtrage inverse regularise sur {}".format(name))
     plt.suptitle()
     for a in np.logspace(-7,0,8):
@@ -82,6 +88,21 @@ def regul_filtInv(img_bruitee,filtre,name=""):
         invF = np.fft.ifft2(divF)    
         plt.title("pour $\alpha$ = {}".format(a))
         plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')   
+
+
+def regul_filtInv_dct(img_bruitee,filtre,name=""):
+    """
+    Methode de filtrage inverse régularisée par la cdt
+    """
+    plt.subplot("Filtrage inverse regularise sur {}".format(name))
+    plt.suptitle()
+    for a in np.logspace(-7,0,8):
+        t_img = cv2.dct(np.fft.fft2(img_bruitee))
+        t = mDCT(np.fft.fft2(filtre))
+        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),a))
+        invF = cv2.idct(divF)    
+        plt.title("pour $\alpha$ = {}".format(a))
+        plt.imshow(abs(invF),cmap='gray')
 
 
 
@@ -184,12 +205,14 @@ if __name__ == "__main__":
         
     
     ########## Régularisation du filtre inverse fft ##########
-    regul_filtInv(yf,grille,"yf")       #Cas yf : filtrage avec périodisation de l'image
-    regul_filtInv(yf2,grille2,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
+    regul_filtInv_fft(yf,grille,"yf")       #Cas yf : filtrage avec périodisation de l'image
+    regul_filtInv_fft(yf2,grille2,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
     
     
     ########## Régularisation du filtrage inverse dct ##########
-    
+    regul_filtInv_dct(yc,a,"yc")
+    regul_filtInv_dct(yf,grille,"yf")
+    regul_filtInv_dct(yf2,grille2,"yf2")
     
     
     ########## Effet du bruit Gaussien ##########
