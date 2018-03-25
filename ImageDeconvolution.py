@@ -79,6 +79,7 @@ def regul_filtInv_fft(img_bruitee,filtre,name=""):
     """
     Méthode de filtrage inverse régularisée par la transformée de Fourier
     """
+    plt.figure()
     plt.subplot("Filtrage inverse regularise sur {}".format(name))
     plt.suptitle()
     for a in np.logspace(-7,0,8):
@@ -94,6 +95,7 @@ def regul_filtInv_dct(img_bruitee,filtre,name=""):
     """
     Methode de filtrage inverse régularisée par la cdt
     """
+    plt.figure()
     plt.subplot("Filtrage inverse regularise sur {}".format(name))
     plt.suptitle()
     for a in np.logspace(-7,0,8):
@@ -216,16 +218,25 @@ if __name__ == "__main__":
     
     
     ########## Effet du bruit Gaussien ##########
+    g_noise = np.random.normal(0,1./256,yf2.shape)
+    yg = yf2 + g_noise
+    plt.figure()
+    plt.imshow(yg,cmap="gray")
+    plt.title("yf2 avec un bruit gaussien")
     
+    regul_filtInv_dct(yg,grille2,"yg")
     
     
     ########## Effet du bruit Poivre et Sel ##########
+    noise = np.random.randint(10000,size=yf2.shape)
+    pepper = np.where(noise==0)
+    salt = np.where(noise==9999)
+    yps = np.copy(yf2)
+    yps[pepper[0],pepper[1]] = 0
+    yps[salt[0],salt[1]] = 1
+    plt.figure()
+    plt.imshow(yps,cmap="gray")
+    plt.title("yf2 avec un bruit poivre et sel")
     
+    regul_filtInv_dct(yps,grille2,"yps")
     
-    
-    
-
-
-
-
-
