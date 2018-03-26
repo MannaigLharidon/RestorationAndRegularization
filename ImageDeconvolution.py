@@ -58,7 +58,7 @@ def mDCT(filtre):
     filtre2 = np.zeros((t1,t2))
     for l in range(t1):
         for c in range(t2):
-            filtre2[l][c] = filtre[l][c]
+            filtre2[l][c] = abs(filtre[l][c])
     return filtre2
 
 
@@ -69,8 +69,11 @@ def filtInv(img_bruitee,filtre,name=""):
     plt.figure()
     t_img = np.fft.fft2(img_bruitee)
     t = np.fft.fft2(filtre)
+    print("filtre")
     divF = np.divide(t_img,t)
+    print("div")
     invF = np.fft.ifft2(divF)
+    print("inv")
     plt.title("Filtrage inverse sur {}".format(name))
     plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
 
@@ -177,7 +180,7 @@ if __name__ == "__main__":
     
     plt.figure() 
     dct_t2 = mDCT(t2)
-    dct_x = cv2.dct(x)
+    dct_x = cv2.dct(Inorm)
     y2 = dct_x * dct_t2
     yf2 = abs(cv2.idct(y2))
     plt.title('Lena filtrée avec dct')
@@ -188,7 +191,7 @@ if __name__ == "__main__":
     plt.title('dct vs convolution with symmetry')
     plt.imshow(abs(dy2),cmap='gray')
     plt.colorbar()
-    
+        
 
     
     
@@ -202,8 +205,11 @@ if __name__ == "__main__":
     
     ########## Filtrage inverse ##########
     filtInv(yc,a,"yc")          #Cas yc : filtrage de l'image par convolution
+    print("helololololo")
     filtInv(yf,grille,"yf")     #Cas yf : filtrage avec périodisation de l'image
+    print("zeeeeeeeeeeeet")
     filtInv(yf2,grille2,"yf2")  #Cas yf2 : filtrage avec symmétrisation de l'image
+    print("pffffffffiouuuuuuuuu")
         
     
     ########## Régularisation du filtre inverse fft ##########
