@@ -69,11 +69,8 @@ def filtInv(img_bruitee,filtre,name=""):
     plt.figure()
     t_img = np.fft.fft2(img_bruitee)
     t = np.fft.fft2(filtre)
-    print("filtre")
     divF = np.divide(t_img,t)
-    print("div")
     invF = np.fft.ifft2(divF)
-    print("inv")
     plt.title("Filtrage inverse sur {}".format(name))
     plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')
 
@@ -83,14 +80,14 @@ def regul_filtInv_fft(img_bruitee,filtre,name=""):
     Méthode de filtrage inverse régularisée par la transformée de Fourier
     """
     plt.figure()
-    plt.subplot("Filtrage inverse regularise sur {}".format(name))
-    plt.suptitle()
-    for a in np.logspace(-7,0,8):
-        t_img = np.fft.fft2(img_bruitee)
-        t = np.fft.fft2(filtre)
-        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),a))
+    plt.title("Filtrage inverse sur {}".format(name))
+    t_img = np.fft.fft2(img_bruitee)
+    t = np.fft.fft2(filtre)
+    for alpha in np.logspace(-6,2,9):
+        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),alpha))
         invF = np.fft.ifft2(divF)    
-        plt.title("pour $\alpha$ = {}".format(a))
+        plt.figure()
+        plt.suptitle("Dct regul avec alpha = {}".format(alpha))
         plt.imshow(np.fft.ifftshift(abs(invF)),cmap='gray')   
 
 
@@ -99,14 +96,14 @@ def regul_filtInv_dct(img_bruitee,filtre,name=""):
     Methode de filtrage inverse régularisée par la cdt
     """
     plt.figure()
-    plt.subplot("Filtrage inverse regularise sur {}".format(name))
-    plt.suptitle()
-    for a in np.logspace(-7,0,8):
-        t_img = cv2.dct(np.fft.fft2(img_bruitee))
-        t = mDCT(np.fft.fft2(filtre))
-        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),a))
+    plt.title("Filtrage inverse sur {}".format(name))
+    t_img = cv2.dct(img_bruitee)
+    t = mDCT(np.fft.fft2(filtre))
+    for alpha in np.logspace(-6,2,9):
+        divF = np.divide(np.multiply(t_img,t),np.add(np.power(t,2),alpha))
         invF = cv2.idct(divF)    
-        plt.title("pour $\alpha$ = {}".format(a))
+        plt.figure()
+        plt.suptitle("Dct regul avec alpha = {}".format(alpha))
         plt.imshow(abs(invF),cmap='gray')
 
 
@@ -204,25 +201,22 @@ if __name__ == "__main__":
     """
     
     ########## Filtrage inverse ##########
-    filtInv(yc,a,"yc")          #Cas yc : filtrage de l'image par convolution
-    print("helololololo")
-    filtInv(yf,grille,"yf")     #Cas yf : filtrage avec périodisation de l'image
-    print("zeeeeeeeeeeeet")
-    filtInv(yf2,grille2,"yf2")  #Cas yf2 : filtrage avec symmétrisation de l'image
-    print("pffffffffiouuuuuuuuu")
+    filtInv(yc,grille,"yc")      #Cas yc : filtrage de l'image par convolution
+    filtInv(yf,grille,"yf")      #Cas yf : filtrage avec périodisation de l'image
+    filtInv(yf2,grille,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
         
     
     ########## Régularisation du filtre inverse fft ##########
     regul_filtInv_fft(yf,grille,"yf")       #Cas yf : filtrage avec périodisation de l'image
-    regul_filtInv_fft(yf2,grille2,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
-    
+    regul_filtInv_fft(yf2,grille,"yf2")    #Cas yf2 : filtrage avec symmétrisation de l'image
+
     
     ########## Régularisation du filtrage inverse dct ##########
-    regul_filtInv_dct(yc,a,"yc")
-    regul_filtInv_dct(yf,grille,"yf")
+    regul_filtInv_dct(yc,grille2,"yc")
+    regul_filtInv_dct(yf,grille2,"yf")
     regul_filtInv_dct(yf2,grille2,"yf2")
     
-    
+
     ########## Effet du bruit Gaussien ##########
     g_noise = np.random.normal(0,1./256,yf2.shape)
     yg = yf2 + g_noise
@@ -231,6 +225,7 @@ if __name__ == "__main__":
     plt.title("yf2 avec un bruit gaussien")
     
     regul_filtInv_dct(yg,grille2,"yg")
+
     
     
     ########## Effet du bruit Poivre et Sel ##########
